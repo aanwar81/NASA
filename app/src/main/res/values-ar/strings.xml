@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">صورة اليوم من موقع ناسا</string>
+    <string name="gallery_start_date">اختر تاريخ البداية للتحقق من الصورة</string>
+    <string name="gallery_end_date">اختر تاريخ النهاية للتحقق من الصورة</string>
+    <string name="gallery_date">سنة-شهر-يوم</string>
+    <string name="gallery_view">ابحث</string>
+    <string name="back">السابق</string>
+    <string name="clicked">لقد اخترت صورة</string>
+    <string name="alert_title">المفضل</string>
+    <string name="alert_message">هل تريد إضافة %1$s إلى قائمتك المفضلة؟</string>
+    <string name="alert_yes">نعم</string>
+    <string name="alert_no">لا</string>
+    <string name="toast_alert_message">لقد قمت بحفظ الصورة</string>
+
 
 </resources>

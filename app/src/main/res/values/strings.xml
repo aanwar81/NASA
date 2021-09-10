@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">NASA image of the day</string>
+    <string name="gallery_start_date">Choose start date to get pictures</string>
+    <string name="gallery_end_date">Choose end to get pictures</string>
+    <string name="gallery_date">YYYY-MM-DD</string>
+    <string name="gallery_view">Search</string>
+    <string name="back">Back</string>
+    <string name="clicked">You have selected the picture of</string>
+    <string name="alert_title">Favourite</string>
+    <string name="alert_message">Do you want to add %1$s to the favourites?</string>
+    <string name="alert_yes">Yes</string>
+    <string name="alert_no">No</string>
+    <string name="toast_alert_message">You have saved the picture</string>
+
 </resources>
