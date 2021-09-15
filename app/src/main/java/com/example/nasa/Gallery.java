@@ -1,6 +1,12 @@
 package com.example.nasa;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.content.Context;
 import android.content.Intent;
@@ -15,6 +21,9 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -25,6 +34,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.navigation.NavigationView;
+
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -45,8 +57,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-public class Gallery extends AppCompatActivity {
+public class Gallery extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener{
     public static final String Main_Activity = "prep";
+    private static final String testToolbar = "Toolbar Activity";
     private ListView myList;
     private MyListAdapter myAdapter;
     protected static final String Nasa_query = "Nasa Query";
@@ -64,7 +78,24 @@ public class Gallery extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_gallery);
+        setContentView(R.layout.nav_gallery);
+
+        androidx.appcompat.widget.Toolbar myToolbar = (Toolbar)findViewById(R.id.toolbar);
+
+        setSupportActionBar(myToolbar);
+        getSupportActionBar().setTitle(R.string.gallery);
+        Log.d(testToolbar,"User started the toolbar activity");
+
+
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this,
+                drawer, myToolbar, R.string.open_drawer, R.string.close_drawer);
+
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
 
         myList = (ListView) findViewById(R.id.galleryList);
 
@@ -132,6 +163,56 @@ public class Gallery extends AppCompatActivity {
     public void setPic(Bitmap pic) {
         Log.d(Gallery_Activity, "end picture is" + pic.toString());
         this.pic = pic;
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull @NotNull MenuItem item) {
+        switch(item.getItemId()){
+            case R.id.home:
+                startActivity(new Intent(Gallery.this, MainActivity.class));
+                Log.d(testToolbar, "home Item selected");
+                break;
+
+            case R.id.search:
+                startActivity(new Intent(Gallery.this, Search.class));
+                Log.d(testToolbar, "search Item selected");
+                break;
+
+            case R.id.fav:
+                startActivity(new Intent(Gallery.this, Favorites.class));
+                Log.d(testToolbar, "favorites Item selected");
+                break;
+
+
+        }
+        DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
+        drawerLayout.closeDrawer(GravityCompat.START);
+        return false;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+// Inflate the menu items for use in the action bar
+        Log.d(testToolbar,"User started the toolbar activity");
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.the_menu, menu);
+
+        return true;
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle(getString(R.string.help))
+                .setMessage(getString(R.string.gal_help ))
+                .setPositiveButton(getString(R.string.help_ok), (d, which) -> {
+                })
+                .create();
+
+        dialog.show();
+        return true;
     }
 
 
@@ -231,7 +312,7 @@ public class Gallery extends AppCompatActivity {
                     startDate = "2021-09-01";
                 }
 
-                endDate = MainActivity.endDate;
+                endDate = Search.endDate;
 
                 if (TextUtils.isEmpty(endDate)) {
                     endDate = "2021-09-03";

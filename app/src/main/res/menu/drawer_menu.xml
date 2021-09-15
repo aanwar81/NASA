@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/home"
+        android:title="@string/today"
+        android:icon="@drawable/cal"
+         />
+
+    <item android:id="@+id/search"
+        android:title="@string/gallery_view"
+        android:icon="@drawable/search"
+        />
+
+    <item android:id="@+id/fav"
+        android:title="@string/alert_title"
+        android:icon="@drawable/fav"
+        />
+
+
+
+
+
+</menu>

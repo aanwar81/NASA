@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">صورة اليوم من موقع ناسا</string>
+    <string name="app_name">صورة اليوم من موقع ناسا الإصدار الأول</string>
     <string name="gallery_start_date">اختر تاريخ البداية للتحقق من الصورة</string>
     <string name="gallery_end_date">اختر تاريخ النهاية للتحقق من الصورة</string>
     <string name="gallery_date">سنة-شهر-يوم</string>
@@ -12,6 +12,18 @@
     <string name="alert_yes">نعم</string>
     <string name="alert_no">لا</string>
     <string name="toast_alert_message">لقد قمت بحفظ الصورة</string>
-
-
+    <string name="open_drawer">افتح</string>
+    <string name="close_drawer">اغلق</string>
+    <string name="today">صورة اليوم</string>
+    <string name="gallery">ألبوم الصور</string>
+    <string name="fav">المفضلة</string>
+    <string name="sel">Selected Image</string>
+    <string name="help">مساعدة</string>
+    <string name="help_ok">تم</string>
+    <string name="main_help">بالضغط في أي مكان بالشاشة تظهر رسالة تسأل ان كنت ترغب بإضافة الصورة في قائمتك المفضلة</string>
+    <string name="search_help">إذا أردت أن تبحث عن صور بين تاريخين يمكنك أن تكتب التواريخ في حقول البداية والنهاية والضغط على
+    زر البحث</string>
+    <string name="gal_help">يمكنك الضغط على أي صورة للنظر فيها وقراءة المزيد</string>
+    <string name="fav_help">يمكنك الضغط على أي صورة للنظر فيها وقراءة المزيد. أيضا يمكنك حذف صورة من القائمة بضغط الصورة لمدة طويلة
+    لتظهر رسالة تسألك عن ما اذا كنت ترغب بحذف الصورة أم لا.</string>
 </resources>
