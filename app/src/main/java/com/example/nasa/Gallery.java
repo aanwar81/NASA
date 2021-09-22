@@ -119,7 +119,8 @@ public class Gallery extends AppCompatActivity
             selectedDate=((TextView) view.findViewById(R.id.discViewGal)).getText().toString();
             startActivity(new Intent(Gallery.this, SelectedImage.class));
             Images img = imageList.get(position);
-
+            SelectedImage selectedImage = new SelectedImage();
+            selectedImage.setDate(selectedDate);
             String message =  getString(R.string.clicked) + " " + selectedDate;
             Toast.makeText(Gallery.this, message, Toast.LENGTH_LONG).show();
         });
@@ -357,13 +358,21 @@ public class Gallery extends AppCompatActivity
                                 String title = actor.getString("title");
                                 String desc = actor.getString("date");
                                 imgDate = actor.getString( "url");
+                                switch(imgDate.substring(imgDate.lastIndexOf(".")+1)){
+                                    case "jpg":
+                                    case "png":
+                                        imgDate = actor.getString( "url");break;
+                                    default: imgDate = "https://cdn.mos.cms.futurecdn.net/8gzcr6RpGStvZFA2qRt4v6.jpg"; continue;
+
+                                }
+
                                 InputStream is;
                                 is = new java.net.URL(imgDate).openStream();
                                 picture = BitmapFactory.decodeStream(is);
 
                                 imageList.add(new Images(title,desc,picture));
                                 publishProgress(25 + (50/jObject.length()*i));
-
+                                imgDate = "";
                         }
 
 

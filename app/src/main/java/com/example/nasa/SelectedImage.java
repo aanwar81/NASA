@@ -1,7 +1,9 @@
 package com.example.nasa;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
@@ -108,7 +110,8 @@ public class SelectedImage extends AppCompatActivity
                     .setTitle(getString(R.string.alert_title))
                     .setMessage(getString(R.string.alert_message, selected ))
                     .setPositiveButton(getString(R.string.alert_yes), (d, which) -> {
-                        Toast.makeText(SelectedImage.this, getString(R.string.toast_alert_message), Toast.LENGTH_SHORT).show();
+                        addDataToDatabase("https://api.nasa.gov/planetary/apod?api_key=idVLDwPn5wyemaUVEmwZXizbFDUg8fVDmjn7t5hb&start_date="+ getDate() + "&end_date="+ getDate());
+                        Toast.makeText(SelectedImage.this, getString(R.string.toast_alert_message) , Toast.LENGTH_SHORT).show();
                     })
                     .setNegativeButton(getString(R.string.alert_no), null)
                     .create();
@@ -118,10 +121,22 @@ public class SelectedImage extends AppCompatActivity
 
     }
 
+    private void addDataToDatabase(String url){
+        MyOpener dbOpener = new MyOpener(this);
+        SQLiteDatabase db = dbOpener.getWritableDatabase();
+        ContentValues cValues = new ContentValues(2);
+        cValues.put(MyOpener.col_url,url);
+        db.insert(MyOpener.Table_name, null, cValues);
+
+
+    }
+
     public void setDate(String date) {
         Log.d(Main_Activity, "end date is" + date);
         this.date = date;
     }
+    public String getDate(){return this.date;};
+
 
 
     public String getImgTitle() {
@@ -298,7 +313,7 @@ public class SelectedImage extends AppCompatActivity
             @Override
             protected String doInBackground(String ...args) {
 
-                theDate = Gallery.selectedDate;
+                theDate = getDate();
 
                 Log.d(Main_Activity, "the date in doinbackground is  " + theDate);
                 publishProgress(25);
@@ -333,9 +348,18 @@ public class SelectedImage extends AppCompatActivity
                         JSONObject jObject = new JSONObject(result);
                         String title       = jObject.getString("title");
                         setTitle(title);
+                        String date       = jObject.getString("date");
+                        setDate(date);
                         String desc       = jObject.getString("explanation");
                         setDesc(desc);
                         imgDate = jObject.getString( "url");
+                        switch(imgDate.substring(imgDate.lastIndexOf(".")+1)){
+                            case "jpg":
+                            case "png":
+                                imgDate = jObject.getString( "url");break;
+                            default: imgDate = "https://cdn.mos.cms.futurecdn.net/8gzcr6RpGStvZFA2qRt4v6.jpg"; break;
+
+                        }
                         InputStream is;
                         is = new URL(imgDate).openStream();
                         picture = BitmapFactory.decodeStream(is);

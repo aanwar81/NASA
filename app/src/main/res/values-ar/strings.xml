@@ -20,6 +20,8 @@
     <string name="sel">Selected Image</string>
     <string name="help">مساعدة</string>
     <string name="help_ok">تم</string>
+    <string name="list_delete">حذف الصورة من المفضلة</string>
+    <string name="delete_message">هل أنت متأكد من حذف الصورة من قائمتك المفضلة؟</string>
     <string name="main_help">بالضغط في أي مكان بالشاشة تظهر رسالة تسأل ان كنت ترغب بإضافة الصورة في قائمتك المفضلة</string>
     <string name="search_help">إذا أردت أن تبحث عن صور بين تاريخين يمكنك أن تكتب التواريخ في حقول البداية والنهاية والضغط على
     زر البحث</string>

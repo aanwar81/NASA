@@ -1,7 +1,12 @@
 package com.example.nasa;
 
+
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
@@ -54,8 +59,12 @@ public class MainActivity extends AppCompatActivity
     public static String title;
     public static String desc;
     public static String date = "";
+    public static String startDate = "";
     public static Bitmap pic;
     private ProgressBar progressBar;
+    public static final String shared_prefs = "sharedPrefs";
+    private String email_address;
+    public static final String text = "Picture of the day";
     ArrayList<Images> imageList  = new ArrayList<>();
 
 
@@ -65,6 +74,9 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.nav_main);
+
+
+        //loadList();
 
         androidx.appcompat.widget.Toolbar myToolbar = (Toolbar)findViewById(R.id.toolbar);
 
@@ -101,7 +113,8 @@ public class MainActivity extends AppCompatActivity
                     .setTitle(getString(R.string.alert_title))
                     .setMessage(getString(R.string.alert_message, selected ))
                     .setPositiveButton(getString(R.string.alert_yes), (d, which) -> {
-                        Toast.makeText(MainActivity.this, getString(R.string.toast_alert_message), Toast.LENGTH_SHORT).show();
+                        addDataToDatabase("https://api.nasa.gov/planetary/apod?api_key=idVLDwPn5wyemaUVEmwZXizbFDUg8fVDmjn7t5hb&start_date=" + getDate()+ "&end_date="+ getDate());
+                        Toast.makeText(MainActivity.this, getString(R.string.toast_alert_message) , Toast.LENGTH_SHORT).show();
                     })
                     .setNegativeButton(getString(R.string.alert_no), null)
                     .create();
@@ -109,6 +122,39 @@ public class MainActivity extends AppCompatActivity
             dialog.show();
         });
 
+
+
+
+
+    }
+
+    private void addDataToDatabase(String url){
+        MyOpener dbOpener = new MyOpener(this);
+        SQLiteDatabase db = dbOpener.getWritableDatabase();
+        ContentValues cValues = new ContentValues(2);
+        cValues.put(MyOpener.col_url,url);
+        db.insert(MyOpener.Table_name, null, cValues);
+
+
+    }
+
+    //setting up shared preferences
+    public void saveList(){
+        SharedPreferences sharedEmail = getSharedPreferences(shared_prefs, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedEmail.edit();
+        editor.putString("title", this.title);
+        //editor.putString("picture", this.pic.toString());
+        editor.putString("description", this.desc);
+        editor.apply();
+        Log.d(Gallery_Activity, "list saved " + this.title);
+    }
+
+    public void loadList(){
+        SharedPreferences sharedEmail = getSharedPreferences(shared_prefs, MODE_PRIVATE);
+        //setting the title
+        setTitle(sharedEmail.getString("title", ""));
+        setDesc(sharedEmail.getString("description", ""));
+        Log.d(Gallery_Activity, "list loaded " + this.title);
     }
 
     public String getImgTitle() {
@@ -128,6 +174,17 @@ public class MainActivity extends AppCompatActivity
         Log.d(Gallery_Activity, "end title is" + title);
         this.title = title;
     }
+
+    public void setDate(String date) {
+        Log.d(Gallery_Activity, "date is" + date);
+        this.startDate = date;
+    }
+
+    public String getDate() {
+        return startDate;
+    }
+
+
 
     public Bitmap getPic() {
         return pic;
@@ -180,7 +237,7 @@ public class MainActivity extends AppCompatActivity
                 .setTitle(getString(R.string.help))
                 .setMessage(getString(R.string.main_help ))
                 .setPositiveButton(getString(R.string.help_ok), (d, which) -> {
-                   })
+                })
                 .create();
 
         dialog.show();
@@ -262,7 +319,7 @@ public class MainActivity extends AppCompatActivity
                 imageList.add(new Images(getImgTitle(),getDesc(),getPic()));
                 Log.d(Gallery_Activity, "load data title " + getImgTitle());
                 Log.d(Gallery_Activity, "load data desc " + getDesc());
-                Log.d(Gallery_Activity, "load data pic " + getPic().toString());
+                //Log.d(Gallery_Activity, "load data pic " + getPic().toString());
                 MyListAdapter.this.notifyDataSetChanged();
                 //startActivity(new Intent(Gallery.this, MainActivity.class));
                 progressBar.setVisibility(View.INVISIBLE);
@@ -285,7 +342,7 @@ public class MainActivity extends AppCompatActivity
                 publishProgress(50);
                 try {
 
-                    URL urlJson = new URL("https://api.nasa.gov/planetary/apod?api_key=idVLDwPn5wyemaUVEmwZXizbFDUg8fVDmjn7t5hb&date=");
+                    URL urlJson = new URL("https://api.nasa.gov/planetary/apod?api_key=idVLDwPn5wyemaUVEmwZXizbFDUg8fVDmjn7t5hb&date=" );
 
                     Log.d(Main_Activity, "the url with date is " + urlJson);
 
@@ -303,13 +360,27 @@ public class MainActivity extends AppCompatActivity
                         JSONObject jObject = new JSONObject(result);
                         String title       = jObject.getString("title");
                         setTitle(title);
+                        String date       = jObject.getString("date");
+                        setDate(date);
                         String desc       = jObject.getString("explanation");
                         setDesc(desc);
                         imgDate = jObject.getString( "url");
+                        switch(imgDate.substring(imgDate.lastIndexOf(".")+1)){
+                            case "jpg":
+                            case "png":
+                                imgDate = jObject.getString( "url");break;
+                            default: imgDate = "https://cdn.mos.cms.futurecdn.net/8gzcr6RpGStvZFA2qRt4v6.jpg"; break;
+
+                        }
+
+                        Log.d(Main_Activity, "the picture is " + imgDate.substring(imgDate.lastIndexOf(".")+1));
+
                         InputStream is;
                         is = new URL(imgDate).openStream();
                         picture = BitmapFactory.decodeStream(is);
+                        Log.d(Main_Activity, "the picture is " + imgDate.toString());
                         setPic(picture);
+                        saveList();
                     }
                     urlConnection.disconnect();
                     publishProgress(75);
@@ -327,6 +398,7 @@ public class MainActivity extends AppCompatActivity
 
                 return null;
             }
+
         }
     }
 
