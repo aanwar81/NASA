@@ -12,7 +12,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Nasa">
-        <activity android:name=".SelectedImage"></activity>
+        <activity android:name=".Favorites"></activity>
+        <activity android:name=".Search" />
+        <activity android:name=".Toolbar" />
+        <activity android:name=".SelectedImage" />
         <activity android:name=".Gallery" />
         <activity android:name=".MainActivity">
             <intent-filter>

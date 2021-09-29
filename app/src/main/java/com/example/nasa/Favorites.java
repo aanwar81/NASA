@@ -57,13 +57,13 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-public class Gallery extends AppCompatActivity
+public class Favorites extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener{
     public static final String Main_Activity = "prep";
     private static final String testToolbar = "Toolbar Activity";
     private ListView myList;
     private MyListAdapter myAdapter;
-    protected static final String Nasa_query = "Nasa Query";
+    protected static final String Nasa_query = "Favorites";
     public static String title;
     public static String desc;
     public static String date = "";
@@ -78,12 +78,12 @@ public class Gallery extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.nav_gallery);
+        setContentView(R.layout.nav_favorites);
 
         androidx.appcompat.widget.Toolbar myToolbar = (Toolbar)findViewById(R.id.toolbar);
 
         setSupportActionBar(myToolbar);
-        getSupportActionBar().setTitle(R.string.gallery);
+        getSupportActionBar().setTitle(R.string.fav);
         Log.d(testToolbar,"User started the toolbar activity");
 
 
@@ -97,14 +97,14 @@ public class Gallery extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
 
-        myList = (ListView) findViewById(R.id.galleryList);
+        myList = (ListView) findViewById(R.id.favList);
 
         // Set the adapter which will populate the list view
         myAdapter = new MyListAdapter();
         Log.d(Gallery_Activity, "initiate MyListAdapter");
         myList.setAdapter(myAdapter);
 
-        progressBar = (ProgressBar) findViewById(R.id.galleryProgressBar);
+        progressBar = (ProgressBar) findViewById(R.id.favProgressBar);
         progressBar.setVisibility(View.VISIBLE);
 
         //myList.setAdapter((ListAdapter) (myAdapter  = new MyListAdapter()));
@@ -112,18 +112,56 @@ public class Gallery extends AppCompatActivity
 
         MainActivity main = new MainActivity();
         Log.d(Main_Activity, "the main date is " + main.date);
-        setDate(main.date);
+
         Log.d(Main_Activity, "the gallery date is " + date);
+
+        myList.setOnItemLongClickListener((parent, view, position, id) -> {
+            AlertDialog dialog = new AlertDialog.Builder(this)
+                    .setTitle(getString(R.string.list_delete))
+                    .setMessage(getString(R.string.delete_message))
+                    .setPositiveButton(getString(R.string.alert_yes), (d, which) -> {
+
+                        // remove from database
+                        deleteDataFromDatabase(position,id);
+                         /*
+                        if(frameLayout!=null){
+                            frameLayout.removeAllViewsInLayout();
+                        }
+
+                        Fragment fragment = getSupportFragmentManager().findFragmentByTag(TAG_FRAGMENT);
+                        DetailsFragment messageFragment = new DetailsFragment();
+                        getFragmentManager().beginTransaction().remove().commit();
+
+                         */
+
+                    })
+                    .setNegativeButton(getString(R.string.alert_no), null)
+                    .create();
+
+            dialog.show();
+            return true;
+        });
 
         myList.setOnItemClickListener((parent, view, position, id) -> {
             selectedDate=((TextView) view.findViewById(R.id.discViewGal)).getText().toString();
-            startActivity(new Intent(Gallery.this, SelectedImage.class));
-            Images img = imageList.get(position);
+            Log.d(Main_Activity, "the favorite date is " + selectedDate);
+
             SelectedImage selectedImage = new SelectedImage();
             selectedImage.setDate(selectedDate);
+            startActivity(new Intent(Favorites.this, SelectedImage.class));
+            Images img = imageList.get(position);
+
             String message =  getString(R.string.clicked) + " " + selectedDate;
-            Toast.makeText(Gallery.this, message, Toast.LENGTH_LONG).show();
+            Toast.makeText(Favorites.this, message, Toast.LENGTH_LONG).show();
         });
+
+    }
+
+    public void deleteDataFromDatabase(int position, long id){
+        MyOpener dbOpener = new MyOpener(this);
+        SQLiteDatabase db = dbOpener.getWritableDatabase();
+
+        db.delete(MyOpener.Table_name, MyOpener.col_id + " = ?", new String[] {Long.toString(id)});
 
     }
 
@@ -132,55 +170,23 @@ public class Gallery extends AppCompatActivity
         this.date = date;
     }
 
-    public  String getDate() {
-        Log.d(Main_Activity, "the get date method returns " + this.date);
-        return this.date;
 
-    }
-
-
-    public String getImgTitle() {
-        return title;
-    }
-
-    public void setDesc(String desc) {
-        Log.d(Gallery_Activity, "end desc is" + title);
-        this.desc = desc;
-    }
-
-    public String getDesc() {
-        return desc;
-    }
-
-    public void setTitle(String title) {
-        Log.d(Gallery_Activity, "end title is" + title);
-        this.title = title;
-    }
-
-    public Bitmap getPic() {
-        return pic;
-    }
-
-    public void setPic(Bitmap pic) {
-        Log.d(Gallery_Activity, "end picture is" + pic.toString());
-        this.pic = pic;
-    }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull @NotNull MenuItem item) {
         switch(item.getItemId()){
             case R.id.home:
-                startActivity(new Intent(Gallery.this, MainActivity.class));
+                startActivity(new Intent(Favorites.this, MainActivity.class));
                 Log.d(testToolbar, "home Item selected");
                 break;
 
             case R.id.search:
-                startActivity(new Intent(Gallery.this, Search.class));
+                startActivity(new Intent(Favorites.this, Search.class));
                 Log.d(testToolbar, "search Item selected");
                 break;
 
             case R.id.fav:
-                startActivity(new Intent(Gallery.this, Favorites.class));
+                //startActivity(new Intent(Gallery.this, Favorites.class));
                 Log.d(testToolbar, "favorites Item selected");
                 break;
 
@@ -260,7 +266,7 @@ public class Gallery extends AppCompatActivity
             view = inflater.inflate(R.layout.gallery_layout,parent,false);
 
             // Populate images data
-             ((TextView) view.findViewById(R.id.titleViewGal)).setText(img.title);
+            ((TextView) view.findViewById(R.id.titleViewGal)).setText(img.title);
             ((TextView) view.findViewById(R.id.discViewGal)).setText(img.desc);
             //((ImageView) view.findViewById(R.id.imageView)).setImageResource(img.imgId);
             ((ImageView) view.findViewById(R.id.imageViewGal)).setImageBitmap(img.picture);
@@ -331,53 +337,67 @@ public class Gallery extends AppCompatActivity
                 publishProgress(20);
                 try {
 
-                    URL urlJson = new URL("https://api.nasa.gov/planetary/apod?api_key=idVLDwPn5wyemaUVEmwZXizbFDUg8fVDmjn7t5hb&start_date="+startDate+"&end_date="+endDate);
+                    MyOpener dbOpener = new MyOpener(Favorites.this);
+                    SQLiteDatabase db = dbOpener.getReadableDatabase();
+                    //db.execSQL("delete from "+ MyOpener.Table_name);
 
-                    Log.d(Nasa_query, "the url with date is " + urlJson);
+                    Cursor count = db.rawQuery("select count(*) from " + MyOpener.Table_name, null);
+                    count.moveToFirst();
 
-                    HttpURLConnection urlConnection  = (HttpURLConnection) urlJson.openConnection();
+                    Log.d(Nasa_query, "the cursor count is " + count.getInt(0) );
 
-                    InputStream response = urlConnection.getInputStream();
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(response, "UTF-8"), 8);
-                    StringBuilder sb = new StringBuilder();
-                    String line = null;
+                    Cursor c = db.rawQuery("select * from " + MyOpener.Table_name, null);
+                    int urlIndex = c.getColumnIndex(MyOpener.col_url);
+                    int idIndex = c.getColumnIndex(MyOpener.col_id);
+                    c.moveToFirst();
+                    String url ="";
+                    Log.d(Nasa_query, "the db count is " + c.getColumnCount() );
 
-                    while ((line = reader.readLine()) != null) {
-                        sb.append(line + "\n");
-                        Log.d(Nasa_query, "the Json line is " + line);
-                        String result = sb.toString();
-                        JSONArray jObject = new JSONArray(result);
+                    for(int ii =0;ii<count.getInt(0);ii++) {
+                        Log.d(Nasa_query, "the urlIndex is " + urlIndex + ii);
+                        url  = c.getString(urlIndex);
 
-                        for (int i=0; i<jObject.length(); i++) {
-                            Log.d(Nasa_query, "the Json line is " + i);
-                            JSONObject actor = jObject.getJSONObject(i);
-                            String type = actor.getString("media_type");
-                            Log.d(Nasa_query, "the midea is  " + type);
+                        URL urlJson = new URL(url);
+
+                        Log.d(Nasa_query, "the url with date is " + urlJson + ii);
+
+                        HttpURLConnection urlConnection = (HttpURLConnection) urlJson.openConnection();
+
+                        InputStream response = urlConnection.getInputStream();
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(response, "UTF-8"), 8);
+                        StringBuilder sb = new StringBuilder();
+                        String line = null;
+
+                        while ((line = reader.readLine()) != null) {
+                            sb.append(line + "\n");
+                            Log.d(Nasa_query, "the Json line is " + line);
+                            String result = sb.toString();
+                            JSONArray jObject = new JSONArray(result);
+
+                            for (int i = 0; i < jObject.length(); i++) {
+                                Log.d(Nasa_query, "the Json line is " + i);
+                                JSONObject actor = jObject.getJSONObject(i);
+                                String type = actor.getString("media_type");
+                                Log.d(Nasa_query, "the midea is  " + type);
 
 
                                 String title = actor.getString("title");
                                 String desc = actor.getString("date");
-                                imgDate = actor.getString( "url");
-                                switch(imgDate.substring(imgDate.lastIndexOf(".")+1)){
-                                    case "jpg":
-                                    case "png":
-                                        imgDate = actor.getString( "url");break;
-                                    default: imgDate = "https://cdn.mos.cms.futurecdn.net/8gzcr6RpGStvZFA2qRt4v6.jpg"; continue;
-
-                                }
-
+                                imgDate = actor.getString("url");
                                 InputStream is;
                                 is = new java.net.URL(imgDate).openStream();
                                 picture = BitmapFactory.decodeStream(is);
 
-                                imageList.add(new Images(title,desc,picture));
-                                publishProgress(25 + (50/jObject.length()*i));
-                                imgDate = "";
+                                imageList.add(new Images(title, desc, picture));
+                                publishProgress(25 + (50 / jObject.length() * i));
+
+                            }
+
+
                         }
-
-
+                        urlConnection.disconnect();
+                        c.moveToNext();
                     }
-                    urlConnection.disconnect();
                     publishProgress(75);
                 }
                 catch (FileNotFoundException fne) {

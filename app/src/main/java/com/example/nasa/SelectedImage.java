@@ -1,7 +1,9 @@
 package com.example.nasa;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
@@ -10,6 +12,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -19,9 +24,17 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.google.android.material.navigation.NavigationView;
+
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -34,8 +47,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
-public class SelectedImage extends AppCompatActivity {
+public class SelectedImage extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener{
     public static final String Main_Activity = "Selected Image Activity";
+    private static final String testToolbar = "Toolbar Activity";
     private ListView myList;
     private MyListAdapter myAdapter;
 
@@ -52,7 +67,24 @@ public class SelectedImage extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.selected_image);
+        setContentView(R.layout.nav_selected);
+
+        androidx.appcompat.widget.Toolbar myToolbar = (Toolbar)findViewById(R.id.toolbar);
+
+        setSupportActionBar(myToolbar);
+        getSupportActionBar().setTitle(R.string.sel);
+        Log.d(testToolbar,"User started the toolbar activity");
+
+
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this,
+                drawer, myToolbar, R.string.open_drawer, R.string.close_drawer);
+
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
 
         myList = (ListView) findViewById(R.id.imageList);
 
@@ -78,7 +110,8 @@ public class SelectedImage extends AppCompatActivity {
                     .setTitle(getString(R.string.alert_title))
                     .setMessage(getString(R.string.alert_message, selected ))
                     .setPositiveButton(getString(R.string.alert_yes), (d, which) -> {
-                        Toast.makeText(SelectedImage.this, getString(R.string.toast_alert_message), Toast.LENGTH_SHORT).show();
+                        addDataToDatabase("https://api.nasa.gov/planetary/apod?api_key=idVLDwPn5wyemaUVEmwZXizbFDUg8fVDmjn7t5hb&start_date="+ getDate() + "&end_date="+ getDate());
+                        Toast.makeText(SelectedImage.this, getString(R.string.toast_alert_message) , Toast.LENGTH_SHORT).show();
                     })
                     .setNegativeButton(getString(R.string.alert_no), null)
                     .create();
@@ -88,10 +121,22 @@ public class SelectedImage extends AppCompatActivity {
 
     }
 
+    private void addDataToDatabase(String url){
+        MyOpener dbOpener = new MyOpener(this);
+        SQLiteDatabase db = dbOpener.getWritableDatabase();
+        ContentValues cValues = new ContentValues(2);
+        cValues.put(MyOpener.col_url,url);
+        db.insert(MyOpener.Table_name, null, cValues);
+
+
+    }
+
     public void setDate(String date) {
         Log.d(Main_Activity, "end date is" + date);
         this.date = date;
     }
+    public String getDate(){return this.date;};
+
 
 
     public String getImgTitle() {
@@ -120,6 +165,64 @@ public class SelectedImage extends AppCompatActivity {
         Log.d(Gallery_Activity, "end picture is" + pic.toString());
         this.pic = pic;
     }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull @NotNull MenuItem item) {
+        switch(item.getItemId()){
+            case R.id.home:
+                startActivity(new Intent(SelectedImage.this, MainActivity.class));
+                Log.d(testToolbar, "home Item selected");
+                break;
+
+            case R.id.search:
+                startActivity(new Intent(SelectedImage.this, Search.class));
+                Log.d(testToolbar, "search Item selected");
+                break;
+
+            case R.id.fav:
+                startActivity(new Intent(SelectedImage.this, Favorites.class));
+                Log.d(testToolbar, "favorites Item selected");
+                break;
+
+
+        }
+        DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
+        drawerLayout.closeDrawer(GravityCompat.START);
+        return false;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+// Inflate the menu items for use in the action bar
+        Log.d(testToolbar,"User started the toolbar activity");
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.the_menu, menu);
+
+        return true;
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle(getString(R.string.help))
+                .setMessage(getString(R.string.main_help ))
+                .setPositiveButton(getString(R.string.help_ok), (d, which) -> {
+                })
+                .create();
+
+        dialog.show();
+        return true;
+    }
+
+
+
+
+
+
+
+
 
 
     public  class MyListAdapter extends BaseAdapter {
@@ -210,7 +313,7 @@ public class SelectedImage extends AppCompatActivity {
             @Override
             protected String doInBackground(String ...args) {
 
-                theDate = Gallery.selectedDate;
+                theDate = getDate();
 
                 Log.d(Main_Activity, "the date in doinbackground is  " + theDate);
                 publishProgress(25);
@@ -245,9 +348,18 @@ public class SelectedImage extends AppCompatActivity {
                         JSONObject jObject = new JSONObject(result);
                         String title       = jObject.getString("title");
                         setTitle(title);
+                        String date       = jObject.getString("date");
+                        setDate(date);
                         String desc       = jObject.getString("explanation");
                         setDesc(desc);
                         imgDate = jObject.getString( "url");
+                        switch(imgDate.substring(imgDate.lastIndexOf(".")+1)){
+                            case "jpg":
+                            case "png":
+                                imgDate = jObject.getString( "url");break;
+                            default: imgDate = "https://cdn.mos.cms.futurecdn.net/8gzcr6RpGStvZFA2qRt4v6.jpg"; break;
+
+                        }
                         InputStream is;
                         is = new URL(imgDate).openStream();
                         picture = BitmapFactory.decodeStream(is);

@@ -3,18 +3,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    tools:context=".Favorites"
     android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        tools:context=".MainActivity"
+        tools:context=".Favorites"
         android:orientation="vertical"
 
         >
 
         <ListView
-            android:id="@+id/imageList"
+            android:id="@+id/favList"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
 
@@ -22,7 +23,7 @@
 
         </ListView>
         <ProgressBar
-            android:id="@+id/progressBar"
+            android:id="@+id/favProgressBar"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

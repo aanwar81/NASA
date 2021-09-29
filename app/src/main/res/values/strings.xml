@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">NASA image of the day</string>
+    <string name="app_name">NASA image of the day V 1.0</string>
     <string name="gallery_start_date">Choose start date to get pictures</string>
     <string name="gallery_end_date">Choose end to get pictures</string>
     <string name="gallery_date">YYYY-MM-DD</string>
@@ -11,5 +11,22 @@
     <string name="alert_yes">Yes</string>
     <string name="alert_no">No</string>
     <string name="toast_alert_message">You have saved the picture</string>
+    <string name="open_drawer">Open</string>
+    <string name="close_drawer">Close</string>
+    <string name="today">Picture of the day</string>
+    <string name="gallery">Photo Gallery</string>
+    <string name="fav">Favorites</string>
+    <string name="sel">Selected Image</string>
+    <string name="help">Help</string>
+    <string name="help_ok">Ok</string>
+    <string name="list_delete">Remove from Favorites</string>
+    <string name="delete_message">Are you sure you want to remove the picture from your favorites?</string>
 
+    <string name="main_help">press anywhere on the screen, a message will come up
+        asking you if you want to add the picture to your list of favourites. press yes if you want to add it.</string>
+    <string name="search_help">You can choose which dates you want to search between by filling the start and the end dates
+    then press search.</string>
+    <string name="gal_help">You can press on any picture to see more details.</string>
+    <string name="fav_help">You can press on any picture to see more details. If you want to remove a picture
+     you can long press it and a message will come up asking you if you want to remove it from the favorites.</string>
 </resources>
