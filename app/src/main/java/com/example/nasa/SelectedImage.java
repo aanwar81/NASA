@@ -266,7 +266,7 @@ public class SelectedImage extends AppCompatActivity
             view = inflater.inflate(R.layout.image_layout,parent,false);
 
             // Populate images data
-             ((TextView) view.findViewById(R.id.titleView)).setText(img.title);
+            ((TextView) view.findViewById(R.id.titleView)).setText(img.title);
             ((TextView) view.findViewById(R.id.discView)).setText(img.desc);
             ((ImageView) view.findViewById(R.id.imageView)).setImageBitmap(img.picture);
 
