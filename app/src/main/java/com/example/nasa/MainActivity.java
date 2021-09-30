@@ -363,15 +363,17 @@ public class MainActivity extends AppCompatActivity
                         String date       = jObject.getString("date");
                         setDate(date);
                         String desc       = jObject.getString("explanation");
-                        setDesc(desc);
+
                         imgDate = jObject.getString( "url");
-                        switch(imgDate.substring(imgDate.lastIndexOf(".")+1)){
-                            case "jpg":
-                            case "png":
-                                imgDate = jObject.getString( "url");break;
-                            default: imgDate = "https://cdn.mos.cms.futurecdn.net/8gzcr6RpGStvZFA2qRt4v6.jpg"; break;
+                        String mediaType       = jObject.getString("media_type");
+                        switch(mediaType){
+                            case "video":
+                                imgDate = "https://cdn.mos.cms.futurecdn.net/8gzcr6RpGStvZFA2qRt4v6.jpg"; break;
+                            default: imgDate = jObject.getString( "url");break;
 
                         }
+
+                        setDesc(desc);
 
                         Log.d(Main_Activity, "the picture is " + imgDate.substring(imgDate.lastIndexOf(".")+1));
 
