@@ -260,7 +260,7 @@ public class Gallery extends AppCompatActivity
             view = inflater.inflate(R.layout.gallery_layout,parent,false);
 
             // Populate images data
-             ((TextView) view.findViewById(R.id.titleViewGal)).setText(img.title);
+            ((TextView) view.findViewById(R.id.titleViewGal)).setText(img.title);
             ((TextView) view.findViewById(R.id.discViewGal)).setText(img.desc);
             //((ImageView) view.findViewById(R.id.imageView)).setImageResource(img.imgId);
             ((ImageView) view.findViewById(R.id.imageViewGal)).setImageBitmap(img.picture);
@@ -355,24 +355,25 @@ public class Gallery extends AppCompatActivity
                             Log.d(Nasa_query, "the midea is  " + type);
 
 
-                                String title = actor.getString("title");
-                                String desc = actor.getString("date");
-                                imgDate = actor.getString( "url");
-                                switch(imgDate.substring(imgDate.lastIndexOf(".")+1)){
-                                    case "jpg":
-                                    case "png":
-                                        imgDate = actor.getString( "url");break;
-                                    default: imgDate = "https://cdn.mos.cms.futurecdn.net/8gzcr6RpGStvZFA2qRt4v6.jpg"; continue;
+                            String title = actor.getString("title");
+                            String desc = actor.getString("date");
 
-                                }
 
-                                InputStream is;
-                                is = new java.net.URL(imgDate).openStream();
-                                picture = BitmapFactory.decodeStream(is);
+                            String mediaType       = actor.getString("media_type");
+                            switch(mediaType){
+                                case "video":
+                                    imgDate = "https://cdn.mos.cms.futurecdn.net/8gzcr6RpGStvZFA2qRt4v6.jpg"; continue;
+                                default: imgDate = actor.getString( "url");break;
 
-                                imageList.add(new Images(title,desc,picture));
-                                publishProgress(25 + (50/jObject.length()*i));
-                                imgDate = "";
+                            }
+
+                            InputStream is;
+                            is = new java.net.URL(imgDate).openStream();
+                            picture = BitmapFactory.decodeStream(is);
+
+                            imageList.add(new Images(title,desc,picture));
+                            publishProgress(25 + (50/jObject.length()*i));
+                            imgDate = "";
                         }
 
 
