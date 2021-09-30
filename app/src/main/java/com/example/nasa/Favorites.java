@@ -213,7 +213,7 @@ public class Favorites extends AppCompatActivity
 
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle(getString(R.string.help))
-                .setMessage(getString(R.string.gal_help ))
+                .setMessage(getString(R.string.fav_help ))
                 .setPositiveButton(getString(R.string.help_ok), (d, which) -> {
                 })
                 .create();
